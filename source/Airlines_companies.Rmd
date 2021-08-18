@@ -96,7 +96,7 @@ ggcal(DL$Data, DL$Perc) +
 ## United Airlines (UA)
 ```{r, message = FALSE, echo = FALSE}
 
-# United Airlines
+# United Airlines (UA)
 UA = computeStats(sample2) %>% filter(Cia == "UA")
 
 # Calendar for this company with proportions
@@ -108,7 +108,7 @@ ggcal(UA$Data, UA$Perc) +
 ## SkyWest Airlines (OO)
 ```{r, message = FALSE, echo = FALSE}
 
-# SkyWest Airlines
+# SkyWest Airlines (OO)
 OO = computeStats(sample2) %>% filter(Cia == "OO")
 
 # Calendar for this company with proportions
