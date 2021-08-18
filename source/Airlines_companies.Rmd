@@ -93,6 +93,7 @@ ggcal(DL$Data, DL$Perc) +
 
 ```
 
+
 ## United Airlines (UA)
 ```{r, message = FALSE, echo = FALSE}
 
@@ -104,6 +105,7 @@ ggcal(UA$Data, UA$Perc) +
   scale_fill_gradient(low = "#4575b4", high = "red")
 
 ```
+
 
 ## SkyWest Airlines (OO)
 ```{r, message = FALSE, echo = FALSE}
