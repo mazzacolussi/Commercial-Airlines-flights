@@ -1,0 +1,118 @@
+---
+title: "Airlines Flights"
+author: "Leonardo M. Colussi"
+date: "17/08/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r, message = FALSE}
+# Loads packages
+library(tidyverse)
+library(ggplot2)
+library(ggcal)
+```
+
+## The Dataset
+
+```{r, message = FALSE, echo = FALSE}
+
+# Checks the dataset
+# sample = read_csv("flights.csv.zip", n_max = 1000)
+# sample %>% glimpse()
+
+```
+
+```{r, message = FALSE}
+
+# Gets statistics
+getStats = function(input, pos){
+  input %>% 
+    filter(AIRLINE %in% c("AA", "DL", "UA", "OO"), YEAR == 2015) %>% 
+    drop_na(YEAR, MONTH, DAY, AIRLINE, ARRIVAL_DELAY) %>% 
+    group_by(YEAR, DAY, MONTH, AIRLINE) %>% 
+    summarise(partial_delays = sum(ARRIVAL_DELAY > 10),
+              partial_n = n(), .groups = "drop")
+}
+
+``` 
+
+
+```{r, message = FALSE}
+
+# Gets cols
+mycols = cols_only(YEAR = "i", MONTH = "i", DAY = "i", AIRLINE = "c", ARRIVAL_DELAY = "i")
+
+# Reads partial data
+sample2 = read_csv_chunked("flights.csv.zip", 
+                       callback = DataFrameCallback$new(getStats), 
+                       chunk_size = 1e5,
+                       col_types = mycols)
+```
+
+
+```{r, message = FALSE}
+
+# Gets the daily arrival delay proportions
+computeStats = function(input){
+  input %>% 
+    group_by(AIRLINE, YEAR, DAY, MONTH) %>% 
+    summarise(Perc = sum(partial_delays)/sum(partial_n), .groups = "drop") %>% 
+    rename(Cia = AIRLINE) %>% 
+    mutate(Data = as.Date(paste(YEAR, MONTH, DAY, sep = "-"))) %>% 
+    select(Cia, Data, Perc)
+}
+
+```
+
+## American Airlines (AA)
+```{r, message = FALSE, echo = FALSE}
+
+# American Airlines (AA)
+AA = computeStats(sample2) %>% filter(Cia == "AA")
+
+# Calendar for this company with proportions
+ggcal(AA$Data, AA$Perc) + 
+  scale_fill_gradient(low = "#4575b4", high = "red")
+
+```
+
+## Delta Airlines (DL)
+```{r, message = FALSE, echo = FALSE}
+
+# Delta Airlines (DL)
+DL = computeStats(sample2) %>% filter(Cia == "DL")
+
+# Calendar for this company with proportions
+ggcal(DL$Data, DL$Perc) + 
+  scale_fill_gradient(low = "#4575b4", high = "red")
+
+```
+
+## United Airlines (UA)
+```{r, message = FALSE, echo = FALSE}
+
+# United Airlines
+UA = computeStats(sample2) %>% filter(Cia == "UA")
+
+# Calendar for this company with proportions
+ggcal(UA$Data, UA$Perc) + 
+  scale_fill_gradient(low = "#4575b4", high = "red")
+
+```
+
+## SkyWest Airlines (OO)
+```{r, message = FALSE, echo = FALSE}
+
+# SkyWest Airlines
+OO = computeStats(sample2) %>% filter(Cia == "OO")
+
+# Calendar for this company with proportions
+ggcal(OO$Data, OO$Perc) + 
+  scale_fill_gradient(low = "#4575b4", high = "red")
+
+```
